@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/auth/presentation/components/my_text_field.dart';
+import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import '../components/my_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,7 +14,29 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
-  final passwordControoler = TextEditingController();
+  final passwordController = TextEditingController();
+
+  void login() {
+    final String email = emailController.text;
+    final String password = passwordController.text;
+
+    final authCubit = context.read<AuthCubit>();
+
+    if (email.isNotEmpty && password.isNotEmpty) {
+      authCubit.login(email, password);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Please enter both email and password')));
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,15 +74,13 @@ class _LoginPageState extends State<LoginPage> {
                 //PASSWORD TEXTFIELD
                 const SizedBox(height: 10),
                 MyTextField(
-                    controller: passwordControoler,
+                    controller: passwordController,
                     obscureText: true,
                     hintText: 'Password'),
                 //BUTTON
                 const SizedBox(height: 25),
                 MyButton(
-                  onTap: () {
-                    print('test');
-                  },
+                  onTap: login,
                   text: 'Sign In',
                 ),
                 // Message to register
