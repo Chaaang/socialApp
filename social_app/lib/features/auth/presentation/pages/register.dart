@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/auth/presentation/components/my_button.dart';
 import 'package:social_app/features/auth/presentation/components/my_text_field.dart';
+import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? togglePages;
@@ -11,23 +13,54 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final firstNameControoler = TextEditingController();
-  final lastNameControoler = TextEditingController();
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
-  final passwordControoler = TextEditingController();
-  final confirmControoler = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  void register() {
+    final String name = nameController.text;
+    final String email = emailController.text;
+    final String password = passwordController.text;
+    final String confirmPassword = confirmPasswordController.text;
+
+    final authCubit = context.read<AuthCubit>();
+
+    if (name.isNotEmpty &&
+        email.isNotEmpty &&
+        password.isNotEmpty &&
+        confirmPassword.isNotEmpty) {
+      if (password == confirmPassword) {
+        authCubit.register(name, email, password);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Password don\'t match!')));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill up all the fields!')));
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: Center(
-              child: Container(
-                constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height * 0.9),
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.9),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -43,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     //WELCOME MESSAGE
                     Text(
-                      'Welcome back, you\'ve been missed!',
+                      'Let\'s create an account for you!',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 16,
@@ -52,14 +85,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 25),
 
                     MyTextField(
-                        controller: firstNameControoler,
-                        obscureText: true,
-                        hintText: 'First Name'),
-                    const SizedBox(height: 10),
-                    MyTextField(
-                        controller: lastNameControoler,
-                        obscureText: true,
-                        hintText: 'Last Name'),
+                        controller: nameController,
+                        obscureText: false,
+                        hintText: 'Name'),
+
                     const SizedBox(height: 10),
                     // EMAIL TEXTFIELD
                     MyTextField(
@@ -69,21 +98,21 @@ class _RegisterPageState extends State<RegisterPage> {
                     //PASSWORD TEXTFIELD
                     const SizedBox(height: 10),
                     MyTextField(
-                        controller: passwordControoler,
+                        controller: passwordController,
                         obscureText: true,
                         hintText: 'Password'),
 
                     const SizedBox(height: 10),
 
                     MyTextField(
-                        controller: passwordControoler,
+                        controller: confirmPasswordController,
                         obscureText: true,
                         hintText: 'Confirm Password'),
                     //BUTTON
                     const SizedBox(height: 25),
                     MyButton(
-                      onTap: widget.togglePages,
-                      text: 'Sign In',
+                      onTap: register,
+                      text: 'Register',
                     ),
 
                     // Message to register

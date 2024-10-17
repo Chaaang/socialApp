@@ -3,7 +3,11 @@ class AppUser {
   final String email;
   final String name;
 
-  AppUser({required this.uid, required this.email, required this.name});
+  AppUser({
+    required this.uid,
+    required this.email,
+    required this.name,
+  });
 
   //covert app user to json
 
