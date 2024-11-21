@@ -8,7 +8,8 @@ class MyTextField extends StatelessWidget {
       {super.key,
       required this.controller,
       required this.obscureText,
-      required this.hintText});
+      required this.hintText,
+});
 
   @override
   Widget build(BuildContext context) {
