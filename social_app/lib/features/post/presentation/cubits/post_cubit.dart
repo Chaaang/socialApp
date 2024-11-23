@@ -79,7 +79,7 @@ class PostCubit extends Cubit<PostStates> {
     }
   }
 
-  Future<void> togglePost(String postId, String userId) async {
+  Future<void> toggleLikePost(String postId, String userId) async {
     try {
       await postRepo.toggleLikePost(postId, userId);
     } catch (e) {
@@ -104,6 +104,14 @@ class PostCubit extends Cubit<PostStates> {
       await fetchAllPosts();
     } catch (e) {
       emit(PostsError('Error delete comment: $e'));
+    }
+  }
+
+  Future<void> toggleHeartPost(String postId, String userId) async {
+    try {
+      await postRepo.toggleHeartPost(postId, userId);
+    } catch (e) {
+      emit(PostsError('Failed to toggle heart: $e'));
     }
   }
 }

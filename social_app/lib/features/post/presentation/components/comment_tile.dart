@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/auth/domain/entities/app_user.dart';
@@ -6,11 +7,12 @@ import 'package:social_app/features/post/domain/entities/comment.dart';
 import 'package:social_app/features/post/presentation/cubits/post_cubit.dart';
 
 class CommentTile extends StatefulWidget {
-  //final String imageUrl;
+  final String? imageUrl;
   final Comment comment;
   const CommentTile({
     super.key,
     required this.comment,
+    required this.imageUrl,
   });
 
   @override
@@ -60,6 +62,36 @@ class _CommentTileState extends State<CommentTile> {
       padding: const EdgeInsets.only(left: 20),
       child: Row(
         children: [
+          widget.imageUrl != null
+              ? CachedNetworkImage(
+                  imageUrl: widget.imageUrl!,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: FittedBox(child: Icon(Icons.person))),
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover)),
+                  ),
+                )
+              : const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: FittedBox(
+                    child: Icon(
+                      Icons.person,
+                    ),
+                  ),
+                ),
+          const SizedBox(
+            width: 5,
+          ),
           Text(
             widget.comment.userName,
             style: TextStyle(

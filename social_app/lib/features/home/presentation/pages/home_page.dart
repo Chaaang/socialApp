@@ -59,15 +59,21 @@ class _HomePageState extends State<HomePage> {
           else if (postState is PostsLoaded) {
             var allPosts = postState.posts;
 
-            return ListView.builder(
-              itemCount: allPosts.length,
-              itemBuilder: (context, index) {
-                final post = allPosts[index];
-                return PostTile(
-                  post: post,
-                  onTap: () => deletePost(post.id),
-                );
-              },
+            return ListView(
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: allPosts.length,
+                  itemBuilder: (context, index) {
+                    final post = allPosts[index];
+                    return PostTile(
+                      post: post,
+                      onTap: () => deletePost(post.id),
+                    );
+                  },
+                ),
+              ],
             );
           }
           //error

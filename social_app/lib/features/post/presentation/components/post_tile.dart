@@ -8,6 +8,7 @@ import 'package:social_app/features/post/domain/entities/post.dart';
 import 'package:social_app/features/post/presentation/components/comment_tile.dart';
 import 'package:social_app/features/post/presentation/cubits/post_cubit.dart';
 import 'package:social_app/features/post/presentation/cubits/post_states.dart';
+import 'package:social_app/features/post/presentation/pages/view_full_post_page.dart';
 import 'package:social_app/features/profle/domain/entities/profile_user.dart';
 import 'package:social_app/features/profle/presentation/cubits/profile_cubit.dart';
 import 'package:social_app/features/profle/presentation/pages/profile_page.dart';
@@ -100,12 +101,40 @@ class _PostTileState extends State<PostTile> {
 
     //update like
 
-    postCubit.togglePost(widget.post.id, currentUser!.uid).catchError((error) {
+    postCubit
+        .toggleLikePost(widget.post.id, currentUser!.uid)
+        .catchError((error) {
       setState(() {
         if (isLiked) {
           widget.post.likes.add(currentUser!.uid);
         } else {
           widget.post.likes.remove(currentUser!.uid);
+        }
+      });
+    });
+  }
+
+  void toggleHeartPost() {
+    final isLiked = widget.post.heart.contains(currentUser!.uid);
+
+    setState(() {
+      if (isLiked) {
+        widget.post.heart.remove(currentUser!.uid);
+      } else {
+        widget.post.heart.add(currentUser!.uid);
+      }
+    });
+
+    //update like
+
+    postCubit
+        .toggleHeartPost(widget.post.id, currentUser!.uid)
+        .catchError((error) {
+      setState(() {
+        if (isLiked) {
+          widget.post.heart.add(currentUser!.uid);
+        } else {
+          widget.post.heart.remove(currentUser!.uid);
         }
       });
     });
@@ -245,26 +274,71 @@ class _PostTileState extends State<PostTile> {
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                     ),
+              // Hero(
+              //     tag: 'tag-1',
+              //     child: GestureDetector(
+              //       onTap: () => Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) => ViewFullPostPage(
+              //               post: widget.post,
+              //               profilePicture: postUser?.profileImageUrl,
+              //               isOwnPost: isOwnPost,
+              //               onTap: widget.onTap,
+              //               currentUser: currentUser,
+              //             ),
+              //           )),
+              //       child: CachedNetworkImage(
+              //         imageUrl: widget.post.imageUrl,
+              //         height: 430,
+              //         width: double.infinity,
+              //         fit: BoxFit.cover,
+              //         placeholder: (context, url) =>
+              //             const SizedBox(height: 430),
+              //         errorWidget: (context, url, error) =>
+              //             const Icon(Icons.error),
+              //       ),
+              //     ),
+              //   ),
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Row(
                   children: [
                     //like
                     SizedBox(
-                      width: 50,
+                      width: 40,
                       child: Row(
                         children: [
                           GestureDetector(
                               onTap: toggleLikePost,
                               child: Icon(
                                   widget.post.likes.contains(currentUser!.uid)
+                                      ? Icons.thumb_up_off_alt_rounded
+                                      : Icons.thumb_up_off_alt_outlined,
+                                  color: widget.post.likes
+                                          .contains(currentUser!.uid)
+                                      ? Colors.blue
+                                      : Theme.of(context).colorScheme.primary)),
+                          Text(widget.post.likes.length.toString()),
+                        ],
+                      ),
+                    ),
+                    //heart
+                    SizedBox(
+                      width: 40,
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                              onTap: toggleHeartPost,
+                              child: Icon(
+                                  widget.post.heart.contains(currentUser!.uid)
                                       ? Icons.favorite
                                       : Icons.favorite_border,
-                                  color: widget.post.likes
+                                  color: widget.post.heart
                                           .contains(currentUser!.uid)
                                       ? Colors.red
                                       : Theme.of(context).colorScheme.primary)),
-                          Text(widget.post.likes.length.toString()),
+                          Text(widget.post.heart.length.toString()),
                         ],
                       ),
                     ),
@@ -305,6 +379,7 @@ class _PostTileState extends State<PostTile> {
                           final comment = post.comments[index];
                           return CommentTile(
                             comment: comment,
+                            imageUrl: postUser?.profileImageUrl,
                           );
                         },
                       );

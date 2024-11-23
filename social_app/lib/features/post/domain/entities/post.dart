@@ -10,6 +10,7 @@ class Post {
   final DateTime timeStamp;
   final List<String> likes;
   final List<Comment> comments;
+  final List<String> heart;
 
   Post({
     required this.id,
@@ -20,6 +21,7 @@ class Post {
     required this.timeStamp,
     required this.likes,
     required this.comments,
+    required this.heart,
   });
 
   Post copyWith({String? imageUrl}) {
@@ -31,7 +33,8 @@ class Post {
         imageUrl: imageUrl ?? this.imageUrl,
         timeStamp: timeStamp,
         likes: likes,
-        comments: comments);
+        comments: comments,
+        heart: heart);
   }
 
   Map<String, dynamic> toJson() {
@@ -44,6 +47,7 @@ class Post {
       'timeStamp': Timestamp.fromDate(timeStamp),
       'likes': likes,
       'comments': comments.map((comment) => comment.toJson()).toList(),
+      'heart': heart,
     };
   }
 
@@ -61,6 +65,7 @@ class Post {
         imageUrl: json['imageUrl'],
         timeStamp: (json['timeStamp'] as Timestamp).toDate(),
         likes: List<String>.from(json['likes'] ?? []),
-        comments: comments);
+        comments: comments,
+        heart: List<String>.from(json['heart'] ?? []));
   }
 }

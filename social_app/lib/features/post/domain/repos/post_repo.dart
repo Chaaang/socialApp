@@ -12,4 +12,6 @@ abstract class PostRepo {
 
   Future<void> addComment(String postId, Comment comment);
   Future<void> deleteComment(String postId, String commentId);
+
+  Future<void> toggleHeartPost(String postId, String userId);
 }

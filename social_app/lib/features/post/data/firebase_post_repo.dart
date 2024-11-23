@@ -130,4 +130,33 @@ class FirebasePostRepo implements PostRepo {
       throw Exception('Error adding comment: $e');
     }
   }
+
+  @override
+  Future<void> toggleHeartPost(String postId, String userId) async {
+    try {
+      final postDoc = await postCollection.doc(postId).get();
+
+      if (postDoc.exists) {
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+
+        //check if the user heart the post
+
+        final hasHeart = post.heart.contains(userId);
+
+        if (hasHeart) {
+          post.heart.remove(userId);
+        } else {
+          post.heart.add(userId);
+        }
+
+        await postCollection.doc(postId).update({
+          'heart': post.heart,
+        });
+      } else {
+        throw Exception('Post not found');
+      }
+    } catch (e) {
+      throw Exception('Error toggling heart: $e');
+    }
+  }
 }

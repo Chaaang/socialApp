@@ -56,7 +56,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
           imageUrl: '',
           timeStamp: DateTime.now(),
           likes: [],
-          comments: []);
+          comments: [],
+          heart: []);
 
       if (kIsWeb) {
         postsCubit.createPost(post, imageBytes: imagePickedFile?.bytes);

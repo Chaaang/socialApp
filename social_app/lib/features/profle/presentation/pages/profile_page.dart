@@ -9,6 +9,7 @@ import 'package:social_app/features/profle/presentation/components/profile_stats
 import 'package:social_app/features/profle/presentation/cubits/profile_cubit.dart';
 import 'package:social_app/features/profle/presentation/cubits/profile_states.dart';
 import 'package:social_app/features/profle/presentation/pages/edit_profile_page.dart';
+import 'package:social_app/features/profle/presentation/pages/follower_page.dart';
 
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
@@ -131,137 +132,139 @@ class _ProfilePageState extends State<ProfilePage> {
                       icon: const Icon(Icons.settings))
               ],
             ),
-            body: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: user.profileImageUrl,
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(
-                        Icons.person,
-                        size: 72,
-                        color: Theme.of(context).colorScheme.primary,
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: user.profileImageUrl,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(
+                      Icons.person,
+                      size: 72,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    imageBuilder: (context, imageProvider) => Container(
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          )),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  ProfileStats(
+                    postCount: postCount,
+                    followerCount: user.followers.length,
+                    followingCount: user.following.length,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FollowerPage(
+                                  followers: user.followers,
+                                  following: user.following,
+                                ))),
+                  ),
+                  if (!isOwnPost)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FollowButton(
+                        onPressed: followButtonPressed,
+                        isFollowing: user.followers.contains(currentUser!.uid),
                       ),
-                      imageBuilder: (context, imageProvider) => Container(
-                        height: 120,
-                        width: 120,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                            )),
-                      ),
                     ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    ProfileStats(
-                      postCount: postCount,
-                      followerCount: user.followers.length,
-                      followingCount: user.following.length,
-                    ),
-                    if (!isOwnPost)
-                      SizedBox(
-                        width: double.infinity,
-                        child: FollowButton(
-                          onPressed: followButtonPressed,
-                          isFollowing:
-                              user.followers.contains(currentUser!.uid),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Text(user.email),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Bio',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21),
                         ),
-                      ),
-                    const SizedBox(
-                      height: 15,
+                      ],
                     ),
-                    Text(user.email),
-                    const SizedBox(
-                      height: 15,
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  MyBio(text: user.bio),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Posts',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Bio',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 21),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    MyBio(text: user.bio),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Posts',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 21),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    BlocBuilder<PostCubit, PostStates>(
-                      builder: (context, postState) {
-                        if (postState is PostsLoaded) {
-                          final userPosts = postState.posts
-                              .where((post) => post.userId == widget.uid)
-                              .toList();
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  BlocBuilder<PostCubit, PostStates>(
+                    builder: (context, postState) {
+                      if (postState is PostsLoaded) {
+                        final userPosts = postState.posts
+                            .where((post) => post.userId == widget.uid)
+                            .toList();
 
-                          int posts = userPosts.length;
+                        int posts = userPosts.length;
 
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: posts,
-                            itemBuilder: (context, index) {
-                              final post = userPosts[index];
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: posts,
+                          itemBuilder: (context, index) {
+                            final post = userPosts[index];
 
-                              return PostTile(
-                                post: post,
-                                onTap: () => context
-                                    .read<PostCubit>()
-                                    .deletePost((post.id)),
-                              );
-                            },
-                          );
-                        } else if (postState is PostsLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (postState is PostsError) {
-                          return Center(
-                            child: Text(postState.message),
-                          );
-                        } else {
-                          return const Center(
-                            child: Text('No available post...'),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                            return PostTile(
+                              post: post,
+                              onTap: () => context
+                                  .read<PostCubit>()
+                                  .deletePost((post.id)),
+                            );
+                          },
+                        );
+                      } else if (postState is PostsLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (postState is PostsError) {
+                        return Center(
+                          child: Text(postState.message),
+                        );
+                      } else {
+                        return const Center(
+                          child: Text('No available post...'),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
           );
