@@ -8,7 +8,6 @@ import 'package:social_app/features/post/domain/entities/post.dart';
 import 'package:social_app/features/post/presentation/components/comment_tile.dart';
 import 'package:social_app/features/post/presentation/cubits/post_cubit.dart';
 import 'package:social_app/features/post/presentation/cubits/post_states.dart';
-import 'package:social_app/features/post/presentation/pages/view_full_post_page.dart';
 import 'package:social_app/features/profle/domain/entities/profile_user.dart';
 import 'package:social_app/features/profle/presentation/cubits/profile_cubit.dart';
 import 'package:social_app/features/profle/presentation/pages/profile_page.dart';
